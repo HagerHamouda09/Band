@@ -12,7 +12,7 @@ MAX30105 maxSensor;
 volatile bool fifoReady = false;
 long lastBeat = -1;
 volatile long  SampleIndex=-1;
-float AvgBPM = 0;
+float AvgBPM = 0.0f;
 int32_t SPO2_Reading=0;
 
 uint32_t IR_Buffer[BUFFER_SIZE];
@@ -41,8 +41,14 @@ void max30102_init()
     maxSensor.enableAFULL();
     maxSensor.setFIFOAlmostFull(16);
 
-    pinMode(MAX_INT, INPUT);
+   // pinMode(MAX_INT, INPUT);
+   //Make it pullup as the interrupt line is open drain
+      pinMode(MAX_INT, INPUT_PULLUP);
     attachInterrupt(digitalPinToInterrupt(MAX_INT), MaxISR, FALLING);
+
+    //Added Delay
+        delay(1000);
+
 }
 
 void max30102_update()
@@ -57,6 +63,9 @@ void max30102_update()
     //int index=-1;
     float sum=0;
     int beatCount=0;
+
+    //SparkFun library requires checking to pull data from FIFO 
+    maxSensor.check();
     while (maxSensor.available())
     {
         // index+=1;
@@ -65,11 +74,22 @@ void max30102_update()
         uint32_t  redValue = maxSensor.getRed();
         maxSensor.nextSample();
 
-
+    //  Skin detection check
+        if (irValue < 10000)
+            {
+                AvgBPM = 0;
+                SPO2_Reading = 0;
+                ReadingIndex = 0;   // reset buffer
+                lastBeat = -1;      // reset beat detection
+                return;
+            }
+        //Bound Check before writing to avoid overflow
+        if (ReadingIndex < BUFFER_SIZE)
+        {
         RED_Buffer[ReadingIndex]=redValue;
         IR_Buffer[ReadingIndex]=irValue;
         ReadingIndex++;
-
+        }
         if (checkForBeat(irValue))
         {
             if(lastBeat==-1)
@@ -79,11 +99,26 @@ void max30102_update()
             else
             {
                 //delta between peaks
-                float delta = (SampleIndex - lastBeat) * (1.0 /SAMPLE_RATE);
+               // float delta = (SampleIndex - lastBeat) * (1.0 /SAMPLE_RATE);   
+               
+               //Less floating point noise
+               long diff = SampleIndex - lastBeat;
+                if(diff>0)
+                {
+                float instantBPM = (60.0 * SAMPLE_RATE) / (diff);
                 lastBeat=SampleIndex;
-                float instantBPM = 60.0 / (delta);
-                sum+=instantBPM;
-                beatCount++;
+                // sum+=instantBPM;
+                // beatCount++;
+
+//Check that the readings are not noise spikes
+// can be altered later when handling different conditions
+//now just a verification of sensor
+                    if (instantBPM > 30 && instantBPM < 220)
+                    {
+                    sum+=instantBPM;
+                    beatCount++;
+                    }
+                }
             }
         }
         SampleIndex++;
@@ -116,7 +151,11 @@ void max30102_update()
     //   Serial.print("BPM (from SpO2 calc): "), Serial.println(heartrateCalc);
 
     ReadingIndex = 0;
-    }
+
+//Reset
+    SampleIndex=-1;
+    lastBeat=-1;
+        }
 
 }
 
