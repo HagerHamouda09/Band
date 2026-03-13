@@ -3,16 +3,14 @@
 
 #include "config.h"
 
-class BatteryModule {
-public:
-    void begin();
-    void readVoltage();
-    float getVoltage();
+// Functions
+void battery_begin();
+void battery_update();          // reads voltage and calculates %
+float battery_getVoltage();
+float battery_getPercentage();
 
-private:
-    float voltage;
-};
-
-extern BatteryModule Battery;
+// Global variables (internal use)
+extern float battery_voltage;
+extern float battery_percentage;
 
 #endif
