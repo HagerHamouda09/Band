@@ -14,7 +14,7 @@
 void setup() {
     Serial.begin(115200);
     Wire.begin(SDA_PIN,SCL_PIN);
-    Battery.begin();
+    battery_begin();
 
 ////////////////////////////////////////////////////////////////////////////////////
 //sensors init
@@ -52,7 +52,7 @@ if (millis() - lastPrint > 500)
     float temp=mlx90614_getTemp();
     if(temp >0){
     Serial.print("Body Temp: ");
-    Serial.println(temp_mlx90614);}
+    Serial.println(temp);}
     else  Serial.print("temp not ready");
 
     Serial.print("Voltage: ");
