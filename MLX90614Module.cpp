@@ -1,6 +1,7 @@
 #include "MLX90614Module.h"
 Adafruit_MLX90614 mlx = Adafruit_MLX90614();
 float temp=0;
+float lastTempRead=0;
 void mlx90614_init() {
     Wire.begin();  // Initialize I2C
     if (!mlx.begin()) {
