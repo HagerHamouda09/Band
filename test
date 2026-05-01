@@ -1,0 +1,654 @@
+// #include <Wire.h>
+// #include "MAX30105.h"
+// #include "heartRate.h"
+// #include <Adafruit_MLX90614.h>
+
+// MAX30105 particleSensor;
+// Adafruit_MLX90614 mlx = Adafruit_MLX90614();
+
+// #define SDA_PIN 3
+// #define SCL_PIN 4
+
+// // ===== HEART RATE =====
+// const byte RATE_SIZE = 4;
+// byte rates[RATE_SIZE];
+// byte rateSpot = 0;
+// long lastBeat = 0;
+
+// float beatsPerMinute = 0;
+// int beatAvg = 0;
+
+// // ===== TEMPERATURE TIMING =====
+// unsigned long lastTempRead = 0;
+// float objectTemp = 0;
+// float ambientTemp = 0;
+
+// void setup() {
+//   Serial.begin(115200);
+//   delay(1000);
+
+//   Wire.begin(SDA_PIN, SCL_PIN);
+
+//   // ===== MAX30102 INIT =====
+//   if (!particleSensor.begin(Wire, I2C_SPEED_STANDARD)) {
+//     Serial.println("MAX30102 not found ❌");
+//     while (1);
+//   }
+// particleSensor.setPulseAmplitudeRed(0x24);
+//   particleSensor.setPulseAmplitudeIR(0x24);
+
+//   byte ledBrightness = 60;
+//   byte sampleAverage = 4;
+//   byte ledMode = 2;         // Red + IR
+//   int sampleRate = 100;     // IMPORTANT
+//   int pulseWidth = 411;
+//   int adcRange = 16384;
+
+//   particleSensor.setup(ledBrightness, sampleAverage, ledMode, sampleRate, pulseWidth, adcRange);
+
+  
+//   // ===== MLX90614 INIT =====
+//   if (!mlx.begin()) {
+//     Serial.println("MLX90614 not found ❌");
+//     while (1);
+//   }
+
+//   Serial.println("Sensors ready ✅");
+//   Serial.println("Place your finger on the MAX30102...");
+  
+//   delay(2000); // allow sensor to stabilize
+// }
+
+// void loop() {
+
+//   // ===== READ MAX30102 (FAST LOOP) =====
+//   long irValue = particleSensor.getIR();
+
+//   if (checkForBeat(irValue)) {
+//     long delta = millis() - lastBeat;
+//     lastBeat = millis();
+
+//     beatsPerMinute = 60 / (delta / 1000.0);
+
+//     if (beatsPerMinute < 255 && beatsPerMinute > 20) {
+//       rates[rateSpot++] = (byte)beatsPerMinute;
+//       rateSpot %= RATE_SIZE;
+
+//       beatAvg = 0;
+//       for (byte x = 0; x < RATE_SIZE; x++) {
+//         beatAvg += rates[x];
+//       }
+//       beatAvg /= RATE_SIZE;
+//     }
+//   }
+
+//   // ===== READ MLX90614 (SLOW LOOP - EVERY 1s) =====
+//   if (millis() - lastTempRead > 1000) {
+//     objectTemp = mlx.readObjectTempC();
+//     ambientTemp = mlx.readAmbientTempC();
+//     lastTempRead = millis();
+//   }
+
+//   // ===== OUTPUT =====
+//   Serial.print("IR=");
+//   Serial.print(irValue);
+
+//   Serial.print(" BPM=");
+//   Serial.print(beatsPerMinute);
+
+//   Serial.print(" Avg BPM=");
+//   Serial.print(beatAvg);
+
+//   if (irValue < 30000) {
+//     Serial.print(" ❌ No finger?");
+//   }
+
+//   Serial.print(" | Obj Temp=");
+//   Serial.print(objectTemp);
+//   Serial.print(" °C");
+
+//   Serial.print(" | Amb Temp=");
+//   Serial.print(ambientTemp);
+//   Serial.print(" °C");
+
+//   Serial.println();
+
+//   delay(10);  // 🔥 CRITICAL: keep loop fast
+// }
+
+
+
+
+// // #include <Wire.h>
+// // #include <Adafruit_MLX90614.h>
+
+// // #define SDA_PIN 3
+// // #define SCL_PIN 4
+
+// // Adafruit_MLX90614 mlx = Adafruit_MLX90614();
+
+// // // Timing
+// // unsigned long lastRead = 0;
+// // float objectTemp = 0;
+// // float ambientTemp = 0;
+
+// // void setup() {
+// //   Serial.begin(115200);
+// //   delay(1000);
+
+// //   Wire.begin(SDA_PIN, SCL_PIN);
+
+// //   if (!mlx.begin()) {
+// //     Serial.println("MLX90614 not found ❌");
+// //     while (1);
+// //   }
+
+// //   Serial.println("MLX90614 ready ✅");
+// // }
+
+// // void loop() {
+
+// //   // Read every 1 second
+// //   if (millis() - lastRead > 1000) {
+// //     objectTemp = mlx.readObjectTempC();
+// //     ambientTemp = mlx.readAmbientTempC();
+// //     lastRead = millis();
+// //   }
+
+// //   Serial.print("Object Temp = ");
+// //   Serial.print(objectTemp);
+// //   Serial.print(" °C");
+
+// //   Serial.print(" | Ambient Temp = ");
+// //   Serial.print(ambientTemp);
+// //   Serial.print(" °C");
+
+// //   Serial.println();
+
+// //   delay(100);
+// // }
+
+
+
+
+
+
+
+
+// #include <Wire.h>
+// #include "MAX30105.h"
+// #include "heartRate.h"
+
+// MAX30105 particleSensor;
+
+// #define SDA_PIN 3
+// #define SCL_PIN 4
+
+// // ===== Heart Rate Variables =====
+// const byte RATE_SIZE = 4;
+// byte rates[RATE_SIZE];
+// byte rateSpot = 0;
+// long lastBeat = 0;
+
+// float beatsPerMinute = 0;
+// int beatAvg = 0;
+
+// void setup() {
+//   Serial.begin(115200);
+//   delay(1000);
+
+//   Wire.begin(SDA_PIN, SCL_PIN);
+
+//   // Initialize sensor
+//   if (!particleSensor.begin(Wire, I2C_SPEED_STANDARD)) {
+//     Serial.println("MAX30102 not found ❌");
+//     while (1);
+//   }
+
+//   // Recommended configuration
+//   particleSensor.setup(
+//     60,    // LED brightness (0-255)
+//     4,     // sample average
+//     2,     // LED mode (Red + IR)
+//     100,   // sample rate
+//     411,   // pulse width
+//     16384  // ADC range
+//   );
+
+//   particleSensor.setPulseAmplitudeRed(0x24);
+//   particleSensor.setPulseAmplitudeIR(0x24);
+
+//   Serial.println("Place your finger on the sensor...");
+//   delay(2000);
+// }
+
+// void loop() {
+
+//   long irValue = particleSensor.getIR();
+
+//   // Detect heartbeat
+//   if (checkForBeat(irValue)) {
+//     long delta = millis() - lastBeat;
+//     lastBeat = millis();
+
+//     beatsPerMinute = 60 / (delta / 1000.0);
+
+//     if (beatsPerMinute > 20 && beatsPerMinute < 255) {
+//       rates[rateSpot++] = (byte)beatsPerMinute;
+//       rateSpot %= RATE_SIZE;
+
+//       beatAvg = 0;
+//       for (byte i = 0; i < RATE_SIZE; i++) {
+//         beatAvg += rates[i];
+//       }
+//       beatAvg /= RATE_SIZE;
+//     }
+//   }
+
+//   // Output
+//   Serial.print("IR=");
+//   Serial.print(irValue);
+
+//   Serial.print(" BPM=");
+//   Serial.print(beatsPerMinute);
+
+//   Serial.print(" Avg BPM=");
+//   Serial.print(beatAvg);
+
+//   if (irValue < 30000) {
+//     Serial.print(" ❌ No finger?");
+//   }
+
+//   Serial.println();
+
+//   delay(10);
+// }
+
+
+
+
+// #include <Wire.h>
+// #include "MAX30105.h"
+// #include "heartRate.h"
+// #include <Adafruit_MLX90614.h>
+
+// MAX30105 particleSensor;
+// Adafruit_MLX90614 mlx = Adafruit_MLX90614();
+
+// #define SDA_PIN 3
+// #define SCL_PIN 4
+// #define LED_PIN 5   // ✅ LED on GPIO 5
+
+// // ===== HEART RATE =====
+// const byte RATE_SIZE = 4;
+// byte rates[RATE_SIZE];
+// byte rateSpot = 0;
+// long lastBeat = 0;
+
+// float beatsPerMinute = 0;
+// int beatAvg = 0;
+
+// // ===== TEMPERATURE TIMING =====
+// unsigned long lastTempRead = 0;
+// float objectTemp = 0;
+// float ambientTemp = 0;
+
+// void setup() {
+//   Serial.begin(115200);
+//   delay(1000);
+
+//   Wire.begin(SDA_PIN, SCL_PIN);
+
+//   // LED setup
+//   pinMode(LED_PIN, OUTPUT);
+//   digitalWrite(LED_PIN, HIGH);
+
+//   // ===== MAX30102 INIT =====
+//   if (!particleSensor.begin(Wire, I2C_SPEED_STANDARD)) {
+//     Serial.println("MAX30102 not found ❌");
+//     while (1);
+//   }
+
+//   particleSensor.setPulseAmplitudeRed(0x24);
+//   particleSensor.setPulseAmplitudeIR(0x24);
+
+//   byte ledBrightness = 60;
+//   byte sampleAverage = 4;
+//   byte ledMode = 2;         // Red + IR
+//   int sampleRate = 100;
+//   int pulseWidth = 411;
+//   int adcRange = 16384;
+
+//   particleSensor.setup(ledBrightness, sampleAverage, ledMode, sampleRate, pulseWidth, adcRange);
+
+//   // ===== MLX90614 INIT =====
+//   if (!mlx.begin()) {
+//     Serial.println("MLX90614 not found ❌");
+//     while (1);
+//   }
+
+//   Serial.println("Sensors ready ✅");
+//   Serial.println("Place your finger on the MAX30102...");
+  
+//   delay(2000);
+// }
+
+// void loop() {
+
+//   // ===== READ MAX30102 =====
+//   long irValue = particleSensor.getIR();
+
+//   // ===== FINGER DETECTION (LED CONTROL) =====
+//   if (irValue > 50000) {  // 🔥 adjust if needed
+//     digitalWrite(LED_PIN, HIGH);  // Finger detected
+//   } else {
+//     digitalWrite(LED_PIN, LOW);   // No finger
+//   }
+
+//   // ===== HEART BEAT DETECTION =====
+//   if (checkForBeat(irValue)) {
+//     long delta = millis() - lastBeat;
+//     lastBeat = millis();
+
+//     beatsPerMinute = 60 / (delta / 1000.0);
+
+//     if (beatsPerMinute < 255 && beatsPerMinute > 20) {
+//       rates[rateSpot++] = (byte)beatsPerMinute;
+//       rateSpot %= RATE_SIZE;
+
+//       beatAvg = 0;
+//       for (byte x = 0; x < RATE_SIZE; x++) {
+//         beatAvg += rates[x];
+//       }
+//       beatAvg /= RATE_SIZE;
+//     }
+//   }
+
+//   // ===== TEMPERATURE (EVERY 1s) =====
+//   if (millis() - lastTempRead > 1000) {
+//     objectTemp = mlx.readObjectTempC();
+//     ambientTemp = mlx.readAmbientTempC();
+//     lastTempRead = millis();
+//   }
+
+//   // ===== SERIAL OUTPUT =====
+//   Serial.print("IR=");
+//   Serial.print(irValue);
+
+//   Serial.print(" BPM=");
+//   Serial.print(beatsPerMinute);
+
+//   Serial.print(" Avg BPM=");
+//   Serial.print(beatAvg);
+
+//   if (irValue < 20000) {
+//     Serial.print(" ❌ No finger?");
+//   }
+
+//   Serial.print(" | Obj Temp=");
+//   Serial.print(objectTemp);
+//   Serial.print(" °C");
+
+//   Serial.print(" | Amb Temp=");
+//   Serial.print(ambientTemp);
+//   Serial.print(" °C");
+
+//   Serial.println();
+
+//   delay(10);  // keep loop fast
+// }
+
+// #define BAT_PIN 1   // GPIO6
+
+// // Your resistor values
+// float R1 = 47000.0;
+// float R2 = 47000.0;
+
+// float ADC_MAX = 4095.0;
+// float VREF = 3.3;
+
+// void setup() {
+//   Serial.begin(115200);
+//   delay(1000);
+// }
+
+// void loop() {
+
+//   // ---- Averaging for stability ----
+//   int sum = 0;
+//   for (int i = 0; i < 20; i++) {
+//     sum += analogRead(BAT_PIN);
+//     delay(2);
+//   }
+//   int raw = sum / 20;
+
+//   // Voltage at GPIO pin
+//   float v_pin = (raw / ADC_MAX) * VREF;
+
+//   // Actual battery voltage
+//   float v_batt = v_pin * ((R1 + R2) / R2);  // = x2
+
+//   Serial.print("ADC: ");
+//   Serial.print(raw);
+
+//   Serial.print(" | Pin: ");
+//   Serial.print(v_pin, 3);
+//   Serial.print(" V");
+
+//   Serial.print(" | Battery: ");
+//   Serial.print(v_batt, 3);
+//   Serial.println(" V");
+
+//   delay(1000);
+// }
+
+
+
+
+
+// #include <Wire.h>
+// #include "MAX30105.h"
+// #include "heartRate.h"
+
+// MAX30105 particleSensor;
+
+// // I2C pins (from your setup)
+// #define SDA_PIN 3
+// #define SCL_PIN 4
+
+// // Interrupt pin
+// #define INT_PIN 5
+
+// volatile bool dataReady = false;
+
+// // ISR (must be fast)
+// void IRAM_ATTR maxISR() {
+//   dataReady = true;
+// }
+
+// // Heart rate variables
+// const byte RATE_SIZE = 4;
+// byte rates[RATE_SIZE];
+// byte rateSpot = 0;
+
+// long lastBeat = 0;
+// float beatsPerMinute = 0;
+// int beatAvg = 0;
+
+// void setup() {
+//   Serial.begin(115200);
+//   delay(1000);
+
+//   // I2C init
+//   Wire.begin(SDA_PIN, SCL_PIN);
+
+//   // Initialize sensor
+//   if (!particleSensor.begin(Wire, I2C_SPEED_FAST)) {
+//     Serial.println("MAX30102 not found. Check wiring!");
+//     while (1);
+//   }
+
+//   Serial.println("MAX30102 initialized");
+
+//   // Configure sensor (basic HR mode)
+//   byte ledBrightness = 0x1F;
+//   byte sampleAverage = 4;
+//   byte ledMode = 2;
+//   int sampleRate = 100;
+//   int pulseWidth = 411;
+//   int adcRange = 4096;
+
+//   particleSensor.setup(ledBrightness, sampleAverage, ledMode, sampleRate, pulseWidth, adcRange);
+
+//   // Interrupt pin setup
+//   pinMode(INT_PIN, INPUT_PULLUP);
+//   attachInterrupt(digitalPinToInterrupt(INT_PIN), maxISR, FALLING);
+
+//   // Enable FIFO almost full interrupt (so INT pin works)
+// particleSensor.enableAFULL();
+//   Serial.println("Setup complete");
+// }
+
+// void loop() {
+
+//   if (dataReady) {
+//     dataReady = false;
+
+//     long irValue = particleSensor.getIR();
+
+//     if (checkForBeat(irValue)) {
+//       long delta = millis() - lastBeat;
+//       lastBeat = millis();
+
+//       beatsPerMinute = 60 / (delta / 1000.0);
+
+//       if (beatsPerMinute < 255 && beatsPerMinute > 20) {
+//         rates[rateSpot++] = (byte)beatsPerMinute;
+//         rateSpot %= RATE_SIZE;
+
+//         beatAvg = 0;
+//         for (byte x = 0; x < RATE_SIZE; x++)
+//           beatAvg += rates[x];
+//         beatAvg /= RATE_SIZE;
+//       }
+//     }
+
+//     Serial.print("IR=");
+//     Serial.print(irValue);
+//     Serial.print(" BPM=");
+//     Serial.print(beatsPerMinute);
+//     Serial.print(" Avg BPM=");
+//     Serial.println(beatAvg);
+//   }
+// }
+
+
+
+
+
+
+#include <Wire.h>
+#include "MAX30105.h"
+#include "heartRate.h"
+
+MAX30105 particleSensor;
+
+// I2C pins
+#define SDA_PIN 3
+#define SCL_PIN 4
+
+// INT pin
+#define INT_PIN 5
+
+volatile bool dataReady = false;
+
+// ===== Heart Rate Variables =====
+const byte RATE_SIZE = 4;
+byte rates[RATE_SIZE];
+byte rateSpot = 0;
+
+long lastBeat = 0;
+float beatsPerMinute = 0;
+int beatAvg = 0;
+
+// ISR (must be fast)
+void IRAM_ATTR maxISR() {
+  dataReady = true;
+}
+
+void setup() {
+  Serial.begin(115200);
+  delay(1000);
+
+  Wire.begin(SDA_PIN, SCL_PIN);
+
+  // Initialize sensor
+  if (!particleSensor.begin(Wire, I2C_SPEED_FAST)) {
+    Serial.println("MAX30102 not found ❌");
+    while (1);
+  }
+
+  Serial.println("MAX30102 initialized");
+
+  // Sensor setup
+  particleSensor.setup(
+    60,     // LED brightness
+    4,      // sample average
+    2,      // Red + IR
+    100,    // sample rate
+    411,    // pulse width
+    16384   // ADC range
+  );
+
+  particleSensor.setPulseAmplitudeRed(0x24);
+  particleSensor.setPulseAmplitudeIR(0x24);
+
+  // INT pin setup
+  pinMode(INT_PIN, INPUT_PULLUP);
+  attachInterrupt(digitalPinToInterrupt(INT_PIN), maxISR, FALLING);
+
+  Serial.println("Ready. Place finger...");
+}
+
+void loop() {
+  
+  if (dataReady) {
+    dataReady = false;
+
+    // Read FIFO (not single IR sample anymore)
+    while (particleSensor.available()) {
+
+      long irValue = particleSensor.getIR();
+
+      if (checkForBeat(irValue)) {
+        long delta = millis() - lastBeat;
+        lastBeat = millis();
+
+        beatsPerMinute = 60 / (delta / 1000.0);
+
+        if (beatsPerMinute > 20 && beatsPerMinute < 255) {
+          rates[rateSpot++] = (byte)beatsPerMinute;
+          rateSpot %= RATE_SIZE;
+
+          beatAvg = 0;
+          for (byte i = 0; i < RATE_SIZE; i++) {
+            beatAvg += rates[i];
+          }
+          beatAvg /= RATE_SIZE;
+        }
+      }
+
+      // Move to next sample in FIFO
+      particleSensor.nextSample();
+    }
+
+    Serial.print("IR=");
+    Serial.print(particleSensor.getIR());
+
+    Serial.print(" BPM=");
+    Serial.print(beatsPerMinute);
+
+    Serial.print(" Avg BPM=");
+    Serial.println(beatAvg);
+  }
+}
