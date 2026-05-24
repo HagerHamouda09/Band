@@ -13,8 +13,8 @@ void battery_begin() {
 
 void battery_update() {
     int adcValue = analogRead(BATTERY_INDICATOR);      // read ADC
-    battery_voltage = (adcValue / 4095.0) * 3.3 * 2;   // adjust factor for voltage divider
-    battery_percentage = (battery_voltage - 3.3) / (4.2 - 3.3) * 100;
+    battery_voltage = (adcValue / 4095.0) * 3.6;   // adjust factor for voltage divider
+    battery_percentage = (battery_voltage ) / (4.2 - 3.0) * 100;
     battery_percentage = constrain(battery_percentage, 0, 100);
 }
 
