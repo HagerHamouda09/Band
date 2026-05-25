@@ -9,5 +9,6 @@ void mlx90614_init();
 float mlx90614_readObjectTemp();
 void mlx90614_update();
 float mlx90614_getTemp();
+bool mlxReady();
 
 #endif

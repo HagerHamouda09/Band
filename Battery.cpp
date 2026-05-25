@@ -1,7 +1,7 @@
 #include "Battery.h"
 #include <Arduino.h>
 
-// Global variables
+
 float battery_voltage = 0;
 float battery_percentage = 0;
 
@@ -12,9 +12,9 @@ void battery_begin() {
 }
 
 void battery_update() {
-    int adcValue = analogRead(BATTERY_INDICATOR);      // read ADC
-    battery_voltage = (adcValue / 4095.0) * 3.6;   // adjust factor for voltage divider
-    battery_percentage = (battery_voltage ) / (4.2 - 3.0) * 100;
+    int adcValue = analogRead(BATTERY_INDICATOR);     
+    battery_voltage = (adcValue / 4095.0) * 1.8*2;   
+    battery_percentage = (battery_voltage - 3.0 ) / (3.6 - 3.0) * 100;
     battery_percentage = constrain(battery_percentage, 0, 100);
 }
 
@@ -24,4 +24,8 @@ float battery_getVoltage() {
 
 float battery_getPercentage() {
     return battery_percentage;
+}
+
+bool  batteryIsDrained(){
+    return battery_percentage<=10?true:false;
 }

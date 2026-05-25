@@ -3,13 +3,12 @@
 
 #include "config.h"
 
-// Functions
 void battery_begin();
-void battery_update();          // reads voltage and calculates %
+void battery_update();         
 float battery_getVoltage();
 float battery_getPercentage();
+bool batteryIsDrained();
 
-// Global variables (internal use)
 extern float battery_voltage;
 extern float battery_percentage;
 

@@ -26,12 +26,17 @@
 Adafruit_MLX90614 mlx = Adafruit_MLX90614();
 float temp=0;
 float lastTempRead=0;
+bool mlxIsReady = false;
+
+
 void mlx90614_init() {
     Wire.begin();  // Initialize I2C
     if (!mlx.begin()) {
         Serial.println("MLX90614 not detected!");
-        while (1);
+       // while (1);
     }
+mlxIsReady=true;
+
     // Set human skin emissivity
     mlx.writeEmissivity(0.98);
     Serial.println("MLX90614 Ready");
@@ -59,6 +64,11 @@ void mlx90614_update() {
 float mlx90614_getTemp()
 {
     return temp;
+}
+
+
+bool mlxReady(){
+    return mlxIsReady;
 }
 
 //float bodyTemp = temp + 2.0;

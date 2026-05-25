@@ -10,5 +10,7 @@ void max30102_init();
 void max30102_update();
 float max30102_getBPM();
 int32_t max30102_getSpo2();
+bool maxReady();
+bool exceededTrials();
 
 #endif
