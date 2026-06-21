@@ -87,7 +87,7 @@ void ble_update() {
 }
 
 
-void ble_sendData(float battery_percentage, float bpm, int32_t spO2) {
+void ble_sendData(float battery_percentage, float bpm, int32_t spO2 , float temp) {
     if (!deviceConnected || pTxCharacteristic == nullptr) {
         return;
     }
@@ -106,10 +106,11 @@ void ble_sendData(float battery_percentage, float bpm, int32_t spO2) {
     snprintf(
         buffer,
         sizeof(buffer),
-        "BATT:%.1f\nspO2:%ld\nbpm:%.1f\n",
+        "BATT:%.1f\nspO2:%ld\nbpm:%.1f\ntemp%.1f\n",
         battery_percentage,
         (long)spO2,
-        bpm
+        bpm,
+        temp
     );
 
     pTxCharacteristic->setValue((uint8_t*)buffer, strlen(buffer));

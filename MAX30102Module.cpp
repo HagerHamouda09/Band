@@ -1,3 +1,4 @@
+
 #include "MAX30102Module.h"
 #include <Wire.h>
 #include "MAX30105.h"
@@ -33,10 +34,10 @@ void max30102_init()
     maxSensor.setup(LED_BRIGHTNESS, SAMPLE_AVERAGE, LED_MODE,
                  SAMPLE_RATE, PULSE_WIDTH, ADC_RANGE);
 
-    maxSensor.setPulseAmplitudeRed(0x3F);
-    maxSensor.setPulseAmplitudeIR(0x3F);
+    maxSensor.setPulseAmplitudeRed(0x7F);
+    maxSensor.setPulseAmplitudeIR(0x7F);
     delay(1000);
-
+    
 }
 
 void max30102_update()
@@ -117,7 +118,7 @@ void max30102_update()
         &spo2, &validSPO2, &heartrateCalc, &validHeartRate
     );
 
-    if (validSPO2)
+    if (validSPO2 && spo2 >= 70 && spo2 <= 100)
     {
       Serial.print("SpO2: "), Serial.println(spo2);
     SPO2_Reading=spo2;

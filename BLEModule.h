@@ -9,7 +9,7 @@
 
 void ble_begin();
 void ble_update();                             
-void ble_sendData(float battery_percentage, float bpm , int32_t spO2   );   
+void ble_sendData(float battery_percentage, float bpm , int32_t spO2 , float temp  );   
 void ble_send_systemcheck(bool passed);
 void ble_send_exceeded_trials();
 void ble_handleCommand(char cmd);

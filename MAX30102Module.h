@@ -12,5 +12,6 @@ float max30102_getBPM();
 int32_t max30102_getSpo2();
 bool maxReady();
 bool exceededTrials();
+bool maximumTrials();
 
 #endif

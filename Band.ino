@@ -13,10 +13,11 @@ void vitalSending(){
     max30102_update();
     battery_update();
     ble_update(); 
-    if (millis() - lastRead >= 2000 && sendcounter>2)
+    mlx90614_update();
+    if (millis() - lastRead >= 2000 /*&& sendcounter>2*/)
     {   
         lastRead = millis();
-        ble_sendData(battery_getPercentage(),max30102_getBPM(),max30102_getSpo2());
+        ble_sendData(battery_getPercentage(),max30102_getBPM(),max30102_getSpo2(),mlx90614_getTemp());
         delay(10);
         static unsigned long lastPrint = 0;
         Serial.print("BPM: ");
@@ -25,11 +26,11 @@ void vitalSending(){
         Serial.print("SpO2: ");
         Serial.println(max30102_getSpo2());
         
-        // float temp=mlx90614_getTemp();
-        // if(temp >0){
-        // Serial.print("Body Temp: ");
-        // Serial.println(temp);}
-        // else  Serial.print("temp not ready");
+        float temp=mlx90614_getTemp();
+        if(temp >0){
+        Serial.print("Body Temp: ");
+        Serial.println(temp);}
+        else  Serial.print("temp not ready");
 
         Serial.print("Voltage: ");
         Serial.print(battery_getVoltage());
@@ -48,7 +49,7 @@ void setup() {
 
     battery_begin();
     max30102_init();
-   // mlx90614_init();
+   mlx90614_init();
     ble_begin();
     delay(2000);
     Serial.println("Band ready. Place finger on sensor.");
@@ -59,7 +60,7 @@ void loop()
  {  battery_update();
     switch (systemstate){
         case SYSTEM_CHECK :
-            if ( ble_isConnected() && maxReady() /* &&  mlxReady()*/ && !batteryIsDrained() ){          
+            if ( ble_isConnected() && maxReady()  &&  mlxReady() && !batteryIsDrained() ){          
                 ble_send_systemcheck(true);////////7 wait mn mobile el system da5al idle
             }else 
                 ble_send_systemcheck(false);//MOSHEKELA ASHAN HWA MESH CONNECTED W BYB3T BEH
@@ -84,7 +85,7 @@ void loop()
                 //c is very large we should notify mobile(fleet admin) to end trip-> driver not wearning band 
                 ////C IS VERY LARGE END SYSTEM
                 ble_send_maximumTrials();
-                systemstate=SYSTEM_END;
+                systemstate=SYSTEM_END;// 
             }
             //mobile application should 
         break;
