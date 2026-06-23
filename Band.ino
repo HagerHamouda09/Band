@@ -60,7 +60,7 @@ void loop()
  {  battery_update();
     switch (systemstate){
         case SYSTEM_CHECK :
-            if ( ble_isConnected() && maxReady()  &&  mlxReady() && !batteryIsDrained() ){          
+            if ( ble_isConnected() && maxReady()  &&  mlxReady() /* && !batteryIsDrained()*/ ){          
                 ble_send_systemcheck(true);////////7 wait mn mobile el system da5al idle
             }else 
                 ble_send_systemcheck(false);//MOSHEKELA ASHAN HWA MESH CONNECTED W BYB3T BEH
@@ -85,7 +85,7 @@ void loop()
                 //c is very large we should notify mobile(fleet admin) to end trip-> driver not wearning band 
                 ////C IS VERY LARGE END SYSTEM
                 ble_send_maximumTrials();
-                systemstate=SYSTEM_END;// 
+                //systemstate=SYSTEM_END;// 
             }
             //mobile application should 
         break;

@@ -87,7 +87,7 @@ void ble_update() {
 }
 
 
-void ble_sendData(float battery_percentage, float bpm, int32_t spO2 , float temp) {
+void ble_sendData(int32_t battery_percentage, float bpm, int32_t spO2 , float temp) {
     if (!deviceConnected || pTxCharacteristic == nullptr) {
         return;
     }
@@ -106,7 +106,8 @@ void ble_sendData(float battery_percentage, float bpm, int32_t spO2 , float temp
     snprintf(
         buffer,
         sizeof(buffer),
-        "BATT:%.1f\nspO2:%ld\nbpm:%.1f\ntemp%.1f\n",
+        // "BATT:%.1f\nspO2:%ld\nbpm:%.1f\ntemp%.1f\n",
+            "{\"BATT\":%d,\"spO2\":%ld,\"bpm\":%.1f,\"temp\":%.1f}\n",
         battery_percentage,
         (long)spO2,
         bpm,
@@ -128,7 +129,7 @@ void ble_send_systemcheck(bool passed) {
     if (millis() - lastSend < 1000) return;  
     lastSend = millis();
 
-    const char* msg = passed ? "PRECHECK:PASS\n" : "PRECHECK:FAIL\n";
+    const char* msg = passed ? "P\n" : "F\n";
     pTxCharacteristic->setValue((uint8_t*)msg, strlen(msg));
     pTxCharacteristic->notify();
 }
@@ -139,7 +140,7 @@ void ble_send_exceeded_trials(){
     // if (millis() - lastSend < 1000) return;  
     // lastSend = millis();
 
-    const char* msg = "Driver wrong adjustment exceeded";
+    const char* msg = "AD";
     pTxCharacteristic->setValue((uint8_t*)msg, strlen(msg));
     pTxCharacteristic->notify();
 
@@ -151,7 +152,7 @@ void ble_send_maximumTrials()
     // if (millis() - lastSend < 1000) return;  
     // lastSend = millis();
 
-    const char* msg = "driver Not wearing the band for too long , trip Ended";
+    const char* msg = "ET";
     pTxCharacteristic->setValue((uint8_t*)msg, strlen(msg));
     pTxCharacteristic->notify();
 
