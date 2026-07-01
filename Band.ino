@@ -14,7 +14,7 @@ void vitalSending(){
     battery_update();
     ble_update(); 
     mlx90614_update();
-    if (millis() - lastRead >= 2000 /*&& sendcounter>2*/)
+    if (millis() - lastRead >= 2000)
     {   
         lastRead = millis();
         ble_sendData(battery_getPercentage(),max30102_getBPM(),max30102_getSpo2(),mlx90614_getTemp());
@@ -60,10 +60,11 @@ void loop()
  {  battery_update();
     switch (systemstate){
         case SYSTEM_CHECK :
+        //Battery is commented to test while powered from Laptop
             if ( ble_isConnected() && maxReady()  &&  mlxReady() /* && !batteryIsDrained()*/ ){          
-                ble_send_systemcheck(true);////////7 wait mn mobile el system da5al idle
+                ble_send_systemcheck(true);
             }else 
-                ble_send_systemcheck(false);//MOSHEKELA ASHAN HWA MESH CONNECTED W BYB3T BEH
+                ble_send_systemcheck(false);
 
         break;
 
@@ -85,9 +86,7 @@ void loop()
                 //c is very large we should notify mobile(fleet admin) to end trip-> driver not wearning band 
                 ////C IS VERY LARGE END SYSTEM
                 ble_send_maximumTrials();
-                //systemstate=SYSTEM_END;// 
             }
-            //mobile application should 
         break;
         case SYSTEM_END:
             Serial.println("[SYS] Entering deep sleep...");

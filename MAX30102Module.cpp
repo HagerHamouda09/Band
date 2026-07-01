@@ -21,7 +21,7 @@ uint32_t IR_Buffer[BUFFER_SIZE];
 uint32_t RED_Buffer[BUFFER_SIZE];
 static int ReadingIndex=0;
 static bool consequentiveIR=false;
-static bool previous = true;/////false ma3naha en el reading valid
+static bool previous = true;/////false means readings are valid
 
 
 void max30102_init()
@@ -67,9 +67,6 @@ void max30102_update()
                 c++;
                 delay(1000);
 
-                // if(c>= 2){
-                //     consequentiveIR=true;
-                // }
                 if( c == 10 ){
                     Serial.println("Driver is not wearing the band correctly");
                 }

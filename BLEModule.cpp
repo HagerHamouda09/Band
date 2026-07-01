@@ -106,7 +106,6 @@ void ble_sendData(int32_t battery_percentage, float bpm, int32_t spO2 , float te
     snprintf(
         buffer,
         sizeof(buffer),
-        // "BATT:%.1f\nspO2:%ld\nbpm:%.1f\ntemp%.1f\n",
             "{\"BATT\":%d,\"spO2\":%ld,\"bpm\":%.1f,\"temp\":%.1f}\n",
         battery_percentage,
         (long)spO2,
@@ -136,9 +135,6 @@ void ble_send_systemcheck(bool passed) {
 
 void ble_send_exceeded_trials(){
     if (!deviceConnected || pTxCharacteristic == nullptr) return;
-    // static unsigned long lastSend = 0;
-    // if (millis() - lastSend < 1000) return;  
-    // lastSend = millis();
 
     const char* msg = "AD";
     pTxCharacteristic->setValue((uint8_t*)msg, strlen(msg));
@@ -148,9 +144,6 @@ void ble_send_exceeded_trials(){
 void ble_send_maximumTrials()
 {
     if (!deviceConnected || pTxCharacteristic == nullptr) return;
-    // static unsigned long lastSend = 0;
-    // if (millis() - lastSend < 1000) return;  
-    // lastSend = millis();
 
     const char* msg = "ET";
     pTxCharacteristic->setValue((uint8_t*)msg, strlen(msg));

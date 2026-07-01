@@ -7,37 +7,33 @@ bool mlxIsReady = false;
 int calibrated_Temp=0;
 
 void mlx90614_init() {
-    Wire.begin();  // Initialize I2C
+    Wire.begin();  
     if (!mlx.begin()) {
         Serial.println("MLX90614 not detected!");
-       // while (1);
     }
 mlxIsReady=true;
 
-    // Set human skin emissivity
     mlx.writeEmissivity(0.98);
     Serial.println("MLX90614 Ready");
 }
 
-/// Read body temperature with averaging
 float mlx90614_readObjectTemp() {
     float sum = 0;
     for(int i = 0; i < 5; i++) {
         sum += mlx.readObjectTempC();
-        delay(50); // shorter delay is fine for smoothing
+        delay(50);
     }
     return sum / 5.0;
 }
 
-// Update function to call in main loop
 void mlx90614_update() {
-    if (millis() - lastTempRead >= 1000) { // read every 1 second
+    if (millis() - lastTempRead >= 1000) 
+    { 
         lastTempRead = millis();
         temp = mlx90614_readObjectTemp() ;
         calibrated_Temp= temp + 5 ;
        
     }
-   // else temp=0;
 }
 float mlx90614_getTemp()
 {   
@@ -48,21 +44,3 @@ float mlx90614_getTemp()
 bool mlxReady(){
     return mlxIsReady;
 }
-
-//float bodyTemp = temp + 2.0;
-
-// // Update function to call in main loop
-// void mlx90614_update() {
-//     if (millis() - lastTempRead >= 1000) { // read every 1 second
-//         lastTempRead = millis();
-//         temp = mlx90614_readObjectTemp();
-       
-//     }
-//     else temp=0;
-// }
-// float mlx90614_getTemp()
-// {
-//     return temp;
-// }
-
-// //float bodyTemp = temp + 2.0;
