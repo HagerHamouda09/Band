@@ -1,4 +1,3 @@
-### Band Module 
 
 # GuardianDrive – Biometric Health-Monitoring Wearable Band
 
